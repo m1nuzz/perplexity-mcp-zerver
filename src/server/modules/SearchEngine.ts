@@ -63,6 +63,26 @@ export class SearchEngine implements ISearchEngine {
 
         // Wait for and extract the answer
         const answer = await this.waitForCompleteAnswer(page);
+        
+        // Clear cookies and localStorage to prevent history accumulation
+        try {
+          const cookies = await page.cookies();
+          if (cookies.length > 0) {
+            await page.deleteCookie(...cookies);
+            logInfo(`Cleared ${cookies.length} cookies after search`);
+          }
+          
+          await page.evaluate(() => {
+            localStorage.clear();
+            sessionStorage.clear();
+          });
+          logInfo("Cleared localStorage and sessionStorage after search");
+        } catch (cleanupError) {
+          logWarn("Failed to clear storage after search:", {
+            error: cleanupError instanceof Error ? cleanupError.message : String(cleanupError),
+          });
+        }
+        
         return answer;
       }, CONFIG.MAX_RETRIES);
     } catch (error) {

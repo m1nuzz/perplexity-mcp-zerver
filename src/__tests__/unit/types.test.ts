@@ -76,6 +76,7 @@ describe("Type Definitions", () => {
         getBrowser: () => null,
         resetIdleTimeout: () => {},
         getPuppeteerContext: () => ({}) as PuppeteerContext,
+        createIncognitoPage: async () => null,
       };
 
       expect(manager).toBeDefined();

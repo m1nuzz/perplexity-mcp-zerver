@@ -13,6 +13,7 @@ import {
   resetIdleTimeout,
   waitForSearchInput,
 } from "../../utils/puppeteer.js";
+import { CONFIG } from "../config.js";
 
 export class BrowserManager implements IBrowserManager {
   public browser: Browser | null = null;
@@ -23,6 +24,40 @@ export class BrowserManager implements IBrowserManager {
   public idleTimeout: NodeJS.Timeout | null = null;
   public operationCount = 0;
   public readonly IDLE_TIMEOUT_MS = 5 * 60 * 1000;
+
+  /**
+   * Create a new incognito page for isolated browsing
+   * Each search request will use a fresh incognito context to avoid history accumulation
+   */
+  public async createIncognitoPage(): Promise<Page | null> {
+    if (!this.browser) {
+      return null;
+    }
+    
+    try {
+      const context = await this.browser.createBrowserContext();
+      const page = await context.newPage();
+      
+      await page.setViewport({
+        width: 1280,
+        height: 720,
+        deviceScaleFactor: 1,
+        isMobile: false,
+        hasTouch: false,
+      });
+      
+      const ctx = this.getPuppeteerContext();
+      await page.setUserAgent(CONFIG.USER_AGENT);
+      page.setDefaultNavigationTimeout(CONFIG.PAGE_TIMEOUT);
+      
+      return page;
+    } catch (error) {
+      logError("Failed to create incognito page:", {
+        error: error instanceof Error ? error.message : String(error),
+      });
+      return null;
+    }
+  }
 
   public getPuppeteerContext(): PuppeteerContext {
     return {

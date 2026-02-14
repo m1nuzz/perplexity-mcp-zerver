@@ -134,6 +134,7 @@ export interface IBrowserManager {
   getBrowser(): Browser | null;
   resetIdleTimeout(): void;
   getPuppeteerContext(): PuppeteerContext;
+  createIncognitoPage(): Promise<Page | null>;
 }
 
 // ─── CONTENT EXTRACTION TYPES ─────────────────────────────────────────

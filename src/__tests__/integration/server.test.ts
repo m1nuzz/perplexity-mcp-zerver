@@ -83,6 +83,7 @@ describe("MCP Server Integration", () => {
         getBrowser: vi.fn().mockReturnValue(null),
         resetIdleTimeout: vi.fn(),
         getPuppeteerContext: vi.fn().mockReturnValue({}),
+        createIncognitoPage: vi.fn().mockResolvedValue(null),
       };
 
       const mockSearchEngine: ISearchEngine = {

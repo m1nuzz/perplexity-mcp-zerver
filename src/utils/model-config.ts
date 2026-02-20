@@ -18,10 +18,15 @@ export interface ModelConfig {
  */
 export const AVAILABLE_MODELS: ModelConfig[] = [
   {
+    name: "claude-sonnet-4.6-reasoning",
+    displayName: "Claude Sonnet 4.6 Рассуждение",
+    selectorText: "Claude Sonnet 4.6 Рассуждение",
+    isDefault: true,
+  },
+  {
     name: "claude-sonnet-4.6",
     displayName: "Claude Sonnet 4.6",
     selectorText: "Claude Sonnet 4.6",
-    isDefault: true,
   },
   {
     name: "gemini-3.1-pro",
@@ -55,8 +60,13 @@ export const AVAILABLE_MODELS: ModelConfig[] = [
   },
   {
     name: "reasoning",
-    displayName: "Reasoning",
-    selectorText: "Reasoning",
+    displayName: "Reasoning (Claude)",
+    selectorText: "Reasoning", // This is the actual UI label in Perplexity
+  },
+  {
+    name: "claude-opus-4.6",
+    displayName: "Claude Opus 4.6",
+    selectorText: "Claude Opus 4.6",
   },
   {
     name: "sonar",

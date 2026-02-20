@@ -8,7 +8,8 @@ import { logError, logInfo, logWarn } from "../../utils/logging.js";
 import { retryOperation } from "../../utils/puppeteer.js";
 import { CONFIG } from "../config.js";
 import { getValidatedModel } from "../../utils/model-config.js";
-import { setModel } from "../../utils/model-selection.js";
+import { selectModelFinal } from "../../utils/model-selection-final.js";
+import { getModelConfig } from "../../utils/model-config.js";
 
 export class SearchEngine implements ISearchEngine {
   constructor(private readonly browserManager: IBrowserManager) {}
@@ -60,13 +61,12 @@ export class SearchEngine implements ISearchEngine {
 
         logInfo(`Found search input with selector: ${selector}`);
 
-        // Set the model if specified
-        if (model) {
-          const validatedModel = getValidatedModel(model);
-          const modelSet = await setModel(page, validatedModel);
-          if (!modelSet) {
-            logWarn(`Failed to set model "${validatedModel}", proceeding with current model`);
-          }
+        // Set the model (use default if not specified)
+        const validatedModel = model ? getValidatedModel(model) : getValidatedModel(undefined);
+        const modelConfig = getModelConfig(validatedModel);
+        const finalModel = await selectModelFinal(page, validatedModel);
+        if (!finalModel) {
+          logWarn(`Failed to set model "${validatedModel}", proceeding with current model`);
         }
 
         // Perform the search
@@ -74,6 +74,19 @@ export class SearchEngine implements ISearchEngine {
 
         // Wait for and extract the answer
         const answer = await this.waitForCompleteAnswer(page);
+        
+        // Verify that reasoning mode attribution appears if model includes reasoning
+        if (model && (model.includes('reasoning') || model.includes('sonnet-4.6-reasoning'))) {
+          if (!answer.includes('Подготовлено с использованием')) {
+            logWarn('Reasoning model selected but attribution not found in response - toggle may not have been activated');
+            logInfo('This could happen if:');
+            logInfo('1. The reasoning toggle was not found in the UI');
+            logInfo('2. The toggle clicked but state did not change');
+            logInfo('3. Perplexity UI structure changed');
+          } else {
+            logInfo('✓ Reasoning mode attribution confirmed in response');
+          }
+        }
         
         // Clear cookies and localStorage to prevent history accumulation
         try {

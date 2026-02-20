@@ -120,25 +120,28 @@ export class PerplexityServer {
   }
 
   private async handleGetDocumentation(args: Record<string, unknown>): Promise<string> {
-    const typedArgs = args as { query: string; context?: string };
+    const typedArgs = args as { query: string; context?: string; model?: string };
     const searchResult = await this.searchEngine.performSearch(
       `Documentation for ${typedArgs.query}: ${typedArgs.context || ""}`,
+      typedArgs.model,
     );
     return searchResult;
   }
 
   private async handleFindApis(args: Record<string, unknown>): Promise<string> {
-    const typedArgs = args as { requirement: string; context?: string };
+    const typedArgs = args as { requirement: string; context?: string; model?: string };
     const searchResult = await this.searchEngine.performSearch(
       `Find APIs for ${typedArgs.requirement}: ${typedArgs.context || ""}`,
+      typedArgs.model,
     );
     return searchResult;
   }
 
   private async handleCheckDeprecatedCode(args: Record<string, unknown>): Promise<string> {
-    const typedArgs = args as { code: string; technology?: string };
+    const typedArgs = args as { code: string; technology?: string; model?: string };
     const searchResult = await this.searchEngine.performSearch(
       `Check if this ${typedArgs.technology || "code"} is deprecated: ${typedArgs.code}`,
+      typedArgs.model,
     );
     return searchResult;
   }
@@ -148,9 +151,10 @@ export class PerplexityServer {
       query: string;
       detail_level?: "brief" | "normal" | "detailed";
       stream?: boolean;
+      model?: string;
     };
 
-    return await this.searchEngine.performSearch(typedArgs.query);
+    return await this.searchEngine.performSearch(typedArgs.query, typedArgs.model);
   }
 
   private async handleExtractUrlContent(args: Record<string, unknown>): Promise<string> {

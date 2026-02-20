@@ -7,11 +7,13 @@ import type { IBrowserManager, ISearchEngine } from "../../types/index.js";
 import { logError, logInfo, logWarn } from "../../utils/logging.js";
 import { retryOperation } from "../../utils/puppeteer.js";
 import { CONFIG } from "../config.js";
+import { getValidatedModel } from "../../utils/model-config.js";
+import { setModel } from "../../utils/model-selection.js";
 
 export class SearchEngine implements ISearchEngine {
   constructor(private readonly browserManager: IBrowserManager) {}
 
-  async performSearch(query: string): Promise<string> {
+  async performSearch(query: string, model?: string): Promise<string> {
     // Set a global timeout for the entire operation with buffer for MCP
     const operationTimeout = setTimeout(() => {
       logError("Global operation timeout reached, initiating recovery...");
@@ -57,6 +59,15 @@ export class SearchEngine implements ISearchEngine {
         }
 
         logInfo(`Found search input with selector: ${selector}`);
+
+        // Set the model if specified
+        if (model) {
+          const validatedModel = getValidatedModel(model);
+          const modelSet = await setModel(page, validatedModel);
+          if (!modelSet) {
+            logWarn(`Failed to set model "${validatedModel}", proceeding with current model`);
+          }
+        }
 
         // Perform the search
         await this.executeSearch(page, selector, query);

@@ -4,7 +4,7 @@
 
 // ─── SEARCH ENGINE INTERFACE ──────────────────────────────────────────
 export interface ISearchEngine {
-  performSearch(query: string): Promise<string>;
+  performSearch(query: string, model?: string): Promise<string>;
 }
 
 // ─── TOOL HANDLER TYPES ───────────────────────────────────────────────

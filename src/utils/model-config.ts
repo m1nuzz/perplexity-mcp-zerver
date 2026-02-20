@@ -3,6 +3,8 @@
  * Defines available models and validation rules
  */
 
+import { logWarn } from "./logging.js";
+
 export interface ModelConfig {
   name: string;
   displayName: string;

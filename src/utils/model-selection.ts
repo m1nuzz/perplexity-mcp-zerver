@@ -154,7 +154,7 @@ export async function selectModelFromDropdown(page: Page, modelConfig: ModelConf
     }
 
     // Wait a moment for the selection to take effect
-    await page.waitForTimeout(500);
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     logInfo(`Model "${modelConfig.displayName}" selected successfully`);
     return true;
@@ -178,7 +178,7 @@ export async function getAvailableModelsFromDropdown(page: Page): Promise<string
 
     if (!isDropdownOpen) {
       await openModelDropdown(page);
-      await page.waitForTimeout(500);
+      await new Promise((resolve) => setTimeout(resolve, 500));
     }
 
     // Extract model names
@@ -186,7 +186,7 @@ export async function getAvailableModelsFromDropdown(page: Page): Promise<string
       const options = Array.from(document.querySelectorAll(optionSelector));
       return options
         .map((option) => option.textContent?.trim())
-        .filter((text): text is string => Boolean(text) && text.length > 0);
+        .filter((text) => text !== undefined && text !== null && text.length > 0) as string[];
     }, MODEL_OPTION_SELECTOR);
 
     // Close dropdown if we opened it
